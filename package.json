@@ -9,12 +9,12 @@
   "author": "Shane Knudsen",
   "license": "ISC",
   "devDependencies": {
-    "eslint": "^5.14.1",
-    "serverless-offline": "^4.6.0"
+    "eslint": "^5.16.0",
+    "serverless-offline": "^4.10.6"
   },
   "dependencies": {
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
-    "serverless-http": "^1.9.1"
+    "serverless-http": "^1.10.1"
   }
 }
