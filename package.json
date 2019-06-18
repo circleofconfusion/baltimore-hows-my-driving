@@ -1,0 +1,20 @@
+{
+  "name": "baltimore-hows-my-driving",
+  "version": "1.0.0",
+  "description": "Serverless site that gives users information on parking tickets and traffic camera violations in Baltimore.",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Shane Knudsen",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^5.14.1",
+    "serverless-offline": "^4.6.0"
+  },
+  "dependencies": {
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.7",
+    "serverless-http": "^1.9.1"
+  }
+}

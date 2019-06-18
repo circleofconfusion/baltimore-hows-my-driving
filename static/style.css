@@ -1,0 +1,87 @@
+html,body {
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    width: 100%;
+    background-image: url(images/baltimore-lg.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    color: #f3e73b;
+    padding: 100px 0;
+}
+
+#container {
+    border-radius: 30px;
+    border: 4px #161616 solid;
+    background-color: rgba(25,25,25, 0.8);
+    max-width: 800px;
+    margin: auto;
+}
+
+#container h1,
+#container h2 {
+    margin: 10px;
+}
+
+#container h1 {
+    font-size: 3em;
+    text-align: center;
+}
+
+#container form {
+    display: grid;
+    grid-template-columns: min-content 10ch;
+    grid-gap: 5px;
+    margin: 10px;
+}
+
+#container form > input,
+#container form > button {
+    border-radius: 6px;
+    border: 1px solid #8f871d;
+    padding: 5px 7px;
+    background-color: #f0ecb6;
+    color: #161616;
+}
+
+#container form > input {
+    width: 200px;
+}
+
+#violations-table {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#violations-table > li:nth-child(even) {
+    background-color: #f0f0f0;
+}
+
+@media (min-width: 600px) {
+    #violations-table {
+        display:table;
+    }
+
+    #violations-table > li {
+        display: table-row;
+    }
+
+    #violations-table > li > div {
+        display: table-cell;
+        padding: 3px;
+    }
+}
+
+@media (max-width: 599px) {
+    #violations-table > li {
+        margin: 10px 0;
+    }
+
+    li.table-heading {
+        display: none;
+    }
+}
