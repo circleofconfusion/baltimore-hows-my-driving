@@ -1,8 +1,14 @@
 'use strict';
+require('dotenv').config();
+const crypto = require('crypto');
 const https = require('https');
 const { VIOLATION } = require('./constants');
 
-module.exports.twitterWebhook = async function(event) {
+module.exports.twitterWebhook = twitterWebhook;
+module.exports.crcResponse = crcResponse;
+
+async function twitterWebhook(event) {
+  console.log(event);
   const [ state, tag ] = parseIncoming(JSON.parse(event.body).text);
   const data = await getData(state, tag);
   return {
@@ -38,4 +44,13 @@ function textSummary(data) {
 
 function parseIncoming(text) {
   return text.match(/\b[A-Za-z]{2}\:[A-Za-z0-9]+\b/)[0].split(":");
+}
+
+async function crcResponse(event) {
+  const { crc_token } = event.queryStringParameters;
+  const response_token = 'sha256=' + crypto.createHmac('sha256', process.env.TWITTER_CONSUMER_SECRET).update(crc_token).digest('base64');
+  return {
+    statusCode:200,
+    body: JSON.stringify({ response_token })
+  }
 }

@@ -12,6 +12,10 @@
 # Happy Coding!
 
 service: baltimore-hows-my-driving
+
+plugins:
+  - serverless-dotenv-plugin
+
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
 #org: your-org-name
@@ -54,8 +58,10 @@ package:
 #    - include-me.js
 #    - include-me-dir/**
   exclude:
-    - twitterSecrets.txt
+    - .env
     - secrets.txt
+    - package-lock.json
+    - package.json
 
 functions:
   
@@ -65,6 +71,14 @@ functions:
       - http:
           path: twitterWebhook
           method: post
+
+  crcResponse:
+    handler: handler.crcResponse
+    events:
+      - http:
+          path: twitterWebhook
+          method: get
+
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
