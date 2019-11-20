@@ -1,0 +1,22 @@
+{
+  "name": "baltimore-hows-my-driving",
+  "version": "1.0.0",
+  "description": "Responds to Twitter mentions with traffic violation info based on license plate info.",
+  "main": "constants.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/circleofconfusion/baltimore-hows-my-driving.git"
+  },
+  "author": "Shane Knudsen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/circleofconfusion/baltimore-hows-my-driving/issues"
+  },
+  "homepage": "https://github.com/circleofconfusion/baltimore-hows-my-driving#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0"
+  }
+}
