@@ -18,5 +18,8 @@
   "homepage": "https://github.com/circleofconfusion/baltimore-hows-my-driving#readme",
   "dependencies": {
     "dotenv": "^8.2.0"
+  },
+  "devDependencies": {
+    "serverless-dotenv-plugin": "^2.1.1"
   }
 }
