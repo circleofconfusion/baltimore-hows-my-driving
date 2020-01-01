@@ -20,6 +20,7 @@
     "dotenv": "^8.2.0"
   },
   "devDependencies": {
+    "ava": "^2.4.0",
     "serverless-dotenv-plugin": "^2.1.1"
   }
 }
