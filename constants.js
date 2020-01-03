@@ -1,6 +1,34 @@
 module.exports = {
     VIOLATION: {
-    "030": "Red Light",
-    "032": "Speed Camera"
+        "001": "Abandoned vehicle",
+        "002": "No parking at Pimlico event",
+        "003": "Impeding flow of traffic",
+        "004": "Snow emergency route",
+        "005": "Impeding movement of pedestrians",
+        "006": "Fire lane or handicapped",
+        "007": "Parking or parking meter tow-away zone",
+        "008": "No stopping/standing tow-away zone",
+        "009": "Commercial vehicle/residence over 20,000 lbs.",
+        "010": "Commercial vehicle/residence under 20,000 lbs.",
+        "011": "Residential parking",
+        "012": "No stopping/standing",
+        "013": "Blocking garage or driveway",
+        "014": "No stopping/parking stadium event on 33rd St.",
+        "015": "No stopping/parking stadium event Camden Yards",
+        "016": "No stopping/standing in transit stop",
+        "017": "Less than 15 feet from fire hydrant",
+        "018": "Other parking meter violation",
+        "019": "Exceeding 48 hour limit",
+        "020": "Passenger loading zone",
+        "022": "Expired tags",
+        "023": "Taxi stand",
+        "025": "Less than 30 feet from intersection",
+        "026": "No stopping/parking handicapped zone",
+        "027": "No stopping/parking street cleaning",
+        "028": "Cruising",
+        "030": "Red Light",
+        "031": "Right on Red",
+        "032": "Fixed Speed Camera",
+        "033": "Mobile Speed Camera"
     }
 };
