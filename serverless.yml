@@ -62,6 +62,7 @@ package:
     - secrets.txt
     - package-lock.json
     - package.json
+    - '*.spec.js'
 
 functions:
   
