@@ -2,7 +2,7 @@
 require('dotenv').config();
 const crypto = require('crypto');
 const https = require('https');
-const { generateTextSummary, matchLicensePlates } = require('./text-parsing');
+const { generateViolationSummaries, generateTweets, matchLicensePlates } = require('./text-parsing');
 
 module.exports = {
   twitterWebhook,
@@ -10,13 +10,14 @@ module.exports = {
 }
 
 async function twitterWebhook(event) {
-  console.log(event);
-  const [ state, tag ] = matchLicensePlates(JSON.parse(event.body).text);
+  const [ state, tag ] = matchLicensePlates(JSON.parse(event.body).tweet_create_events[0].text);
   const data = await getData(state, tag);
+  const violations = generateViolationSummaries(data);
+  const tweets = generateTweets(state, tag, violations);
   return {
     statusCode: 200,
     body: JSON.stringify({
-      message: generateTextSummary(data)
+      message: tweets
     })
   };
 }
