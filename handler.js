@@ -5,6 +5,11 @@ const crypto = require('crypto');
 const https = require('https');
 const { generateViolationSummaries, generateTweets, matchLicensePlates } = require('./text-parsing');
 
+module.exports = {
+  twitterWebhook,
+  crcResponse
+}
+
 const T = new Twit({
   consumer_key: process.env.TWITTER_CONSUMER_KEY,
   consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
@@ -12,14 +17,9 @@ const T = new Twit({
   access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 });
 
-module.exports = {
-  twitterWebhook,
-  crcResponse
-}
-
 async function twitterWebhook(event) {
   const body = JSON.parse(event.body);
-  if (body.tweet_create_events && body.tweet_create_events.length > 0) {
+  if (respondToTweet(body)) {
     const mention = body.tweet_create_events[0];
 
     const mentionId = mention.id_str;
@@ -41,7 +41,6 @@ async function twitterWebhook(event) {
           auto_populate_reply_metadata: true
         },
         (err, data, reply) => {
-          console.log(reply)
           resolve(reply);
         });
     });
@@ -100,4 +99,16 @@ async function getData(state, tag) {
       reject(Error(err))
     });
   });
+}
+
+function respondToTweet(tweet) {
+  if (
+    tweet.hasOwnProperty('user_has_blocked') &&
+    tweet.hasOwnProperty('tweet_create_events') && 
+    tweet.tweet_create_events.length >= 1
+  ) {
+    return true;
+  } else {
+    return false;
+  }
 }
