@@ -7,6 +7,7 @@ module.exports = {
 }
 
 function matchLicensePlates(text) {
+    console.log('matchLicensePlates text', text)
     return text.match(/\b[A-Za-z]{2}\:[A-Za-z0-9]+\b/)[0].split(":");
 }
 
