@@ -26,9 +26,10 @@ module.exports = {
         "026": "No stopping/parking handicapped zone",
         "027": "No stopping/parking street cleaning",
         "028": "Cruising",
-        "030": "Red Light",
-        "031": "Right on Red",
-        "032": "Fixed Speed Camera",
-        "033": "Mobile Speed Camera"
+        "030": "Red light",
+        "031": "Right on red",
+        "032": "Fixed speed camera",
+        "033": "Mobile speed camera",
+        "099": "Other/unknown violation"
     }
 };

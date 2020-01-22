@@ -1,6 +1,11 @@
 const test = require('ava');
 const { VIOLATION } = require('./constants');
-const { generateViolationSummaries, generateTweets, matchLicensePlates } = require('./text-parsing');
+const { generateViolationSummaries, generateViolationTweets, matchLicensePlates } = require('./text-parsing');
+
+test('matchLicensePlates will match one license plate', t => {
+    const data = matchLicensePlates('@BadDrivingBmore MD:ATRAIN');
+    t.deepEqual(['MD', 'ATRAIN'], data);
+});
 
 test('generateViolationSummaries should handle no violations', t => {
     t.deepEqual(generateViolationSummaries([]), []);
@@ -41,18 +46,18 @@ test('generateViolationSummaries should correctly parse more than one violation 
     );
 });
 
-test('generateTweets should properly generate a single tweet', t => {
+test('generateViolationTweets should properly generate a single tweet', t => {
     const violations = [
         '2 Red light',
         '3 Fixed speed camera'
     ];
     t.deepEqual(
-        generateTweets('MD', 'ATRAIN', violations),
+        generateViolationTweets('MD', 'ATRAIN', violations),
         [ `#MD_ATRAIN Violations:\n\n${violations[0]}\n${violations[1]}` ]
     );
 });
 
-test('generateTweets should properly generate multiple tweets when there are many violations', t => {
+test('generateViolationTweets should properly generate multiple tweets when there are many violations', t => {
     const violations = [
         '2 Red light',
         '3 Fixed speed camera',
@@ -64,7 +69,7 @@ test('generateTweets should properly generate multiple tweets when there are man
         '2 No stopping/parking stadium event on 33rd St.'
     ];
     t.deepEqual(
-        generateTweets('MD', 'ATRAIN', violations),
+        generateViolationTweets('MD', 'ATRAIN', violations),
         [
             `#MD_ATRAIN Violations:\n\n2 Red light\n3 Fixed speed camera\n1 Commercial vehicle/residence under 20,000 lbs.\n3 No stopping/parking stadium event Camden Yards\n1 No stopping/parking handicapped zone\n3 Impeding movement of pedestrians\n1 Blocking garage or driveway`,
             `#MD_ATRAIN Violations Cont'd:\n\n2 No stopping/parking stadium event on 33rd St.`

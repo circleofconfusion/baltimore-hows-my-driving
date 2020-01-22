@@ -3,7 +3,7 @@ require('dotenv').config();
 const Twit = require('twit');
 const crypto = require('crypto');
 const https = require('https');
-const { generateViolationSummaries, generateTweets, matchLicensePlates } = require('./text-parsing');
+const { generateViolationSummaries, generateViolationTweets, matchLicensePlates } = require('./text-parsing');
 
 module.exports = {
   twitterWebhook,
@@ -21,55 +21,55 @@ async function twitterWebhook(event) {
   const body = JSON.parse(event.body);
   if (respondToTweet(body)) {
     const mention = body.tweet_create_events[0];
-
-    const mentionId = mention.id_str;
+    
     const [ state, tag ] = matchLicensePlates(mention.text);
+    const mentionId = mention.id_str;
     const data = await getData(state, tag);
     const violations = generateViolationSummaries(data);
-    const tweets = generateTweets(state, tag, violations);
+    const tweets = generateViolationTweets(state, tag, violations);
 
     // start with replying to original tweet, 
     // and update this value for each subsequent tweet
     let replyToId = mentionId;
 
-    await new Promise(resolve => {
-      T.post(
-        'statuses/update',
-        { 
-          status: tweets[0],
-          in_reply_to_status_id: replyToId,
-          auto_populate_reply_metadata: true
-        },
-        (err, data, reply) => {
-          resolve(reply);
-        });
-    });
-    
-    // Loop through and POST all the generated tweets, updating the replyToId each time.
-    // tweets.forEach(async (tweetText) => {
-    //   console.log("replyToId 1", replyToId);
-    //   replyToId = await new Promise((resolve, reject) => {
-    //     T.post(
-    //       'statuses/update', 
-    //       {
-    //         status: tweetText,
-    //         in_reply_to_status_id: replyToId,
-    //         auto_populate_reply_metadata: true
-    //       },
-    //       (err, data, reply) => {
-    //         console.log(mentionId, replyToId)
-    //         if (err) {
-    //           console.log(err);
-    //           reject();
-    //         } else {
-    //           console.log(reply);
-    //           resolve(data.id_str);
-    //         }
-    //       });
-    //   });
-    //   console.log("replyToId 2", replyToId);
-    // });
-    console.log('returning')
+    const tweetsAsyncIterable = {
+      [Symbol.asyncIterator]() {
+        return {
+          next() {
+            if (tweets.length) {
+              return new Promise((resolve, reject) => {
+                T.post(
+                  'statuses/update',
+                  {
+                    status: tweets.shift(),
+                    in_reply_to_status_id: replyToId,
+                    auto_populate_reply_metadata: true
+                  },
+                  (err, data) => {
+                    if (err) {
+                      console.error(err);
+                      reject(err);
+                    } else {
+                      resolve({
+                        value: data.id_str,
+                        done: false
+                      });
+                    }
+                  }
+                );
+              });
+            } else {
+              return Promise.resolve({done: true});
+            }
+          }
+        };
+      }
+    }
+
+    for await (let id_str of tweetsAsyncIterable) {
+      replyToId = id_str;
+    }
+
     return { statusCode: 200, body: '' };
   }
 }

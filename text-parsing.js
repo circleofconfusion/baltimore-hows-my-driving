@@ -3,20 +3,19 @@ const { VIOLATION } = require('./constants');
 module.exports = {
     matchLicensePlates,
     generateViolationSummaries,
-    generateTweets
+    generateViolationTweets
 }
 
 function matchLicensePlates(text) {
-    console.log('matchLicensePlates text', text)
-    return text.match(/\b[A-Za-z]{2}\:[A-Za-z0-9]+\b/)[0].split(":");
+    return text.match(/\b[A-Za-z]{2}\:[A-Za-z0-9]+\b/)[0].toUpperCase().split(":");
 }
 
 function generateViolationSummaries(data) {
     return data.map(d => `${d.count} ${VIOLATION[d.violcode]}`);
 }
 
-function generateTweets(state, tag, violations) {
-    const heading = `#${state.toUpperCase()}_${tag.toUpperCase()} Violations`
+function generateViolationTweets(state, tag, violations) {
+    const heading = `#${state}_${tag} Violations`
     let tweets = [
         `${heading}:\n`
     ];
