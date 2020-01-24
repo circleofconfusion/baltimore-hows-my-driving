@@ -2,8 +2,8 @@
 require('dotenv').config();
 const Twit = require('twit');
 const crypto = require('crypto');
-const https = require('https');
-const { generateViolationSummaries, generateViolationTweets, matchLicensePlates } = require('./text-parsing');
+const { getViolationData, getDataByYear } = require('./open-baltimore');
+const { generateAnnualSummaryTweets, generateViolationSummaries, generateViolationTweets, matchLicensePlates } = require('./text-parsing');
 
 module.exports = {
   twitterWebhook,
@@ -24,9 +24,18 @@ async function twitterWebhook(event) {
     
     const [ state, tag ] = matchLicensePlates(mention.text);
     const mentionId = mention.id_str;
-    const data = await getData(state, tag);
-    const violations = generateViolationSummaries(data);
-    const tweets = generateViolationTweets(state, tag, violations);
+
+    // violation data
+    const violationData = await getViolationData(state, tag);
+    const violations = generateViolationSummaries(violationData);
+    const violationTweets = generateViolationTweets(state, tag, violations);
+
+    // annual summary data
+    const annualSummaryData = await getDataByYear(state, tag);
+    const annualSummaryTweets = generateAnnualSummaryTweets(state, tag, annualSummaryData);
+
+    // put all the tweets together
+    const tweets = [ ...violationTweets, ...annualSummaryTweets ];
 
     // start with replying to original tweet, 
     // and update this value for each subsequent tweet
@@ -81,24 +90,6 @@ async function crcResponse(event) {
     statusCode:200,
     body: JSON.stringify({ response_token })
   }
-}
-
-async function getData(state, tag) {
-  return new Promise((resolve, reject) => {
-    https.get(
-      `https://data.baltimorecity.gov/resource/2ddy-2uzt.json?$select=violcode,count(violcode) as count&$where=tag='${tag}' AND state='${state}'&$group=violcode`,
-      (response) => {
-        let data = '';
-
-        response.on('data', chunk => { data += chunk });
-        response.on('end', () => {
-          resolve(JSON.parse(data));
-        });
-      }
-    ).on('error', err => { 
-      reject(Error(err))
-    });
-  });
 }
 
 function respondToTweet(tweet) {
