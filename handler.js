@@ -3,7 +3,13 @@ require('dotenv').config();
 const Twit = require('twit');
 const crypto = require('crypto');
 const { getViolationData, getDataByYear } = require('./open-baltimore');
-const { generateAnnualSummaryTweets, generateViolationSummaries, generateViolationTweets, matchLicensePlates } = require('./text-parsing');
+const { 
+  generateNoViolationsTweet,
+  generateAnnualSummaryTweets,
+  generateViolationSummaries,
+  generateViolationTweets,
+  matchLicensePlates
+} = require('./text-parsing');
 
 module.exports = {
   twitterWebhook,
@@ -25,17 +31,22 @@ async function twitterWebhook(event) {
     const [ state, tag ] = matchLicensePlates(mention.text);
     const mentionId = mention.id_str;
 
-    // violation data
+    let tweets = [];
     const violationData = await getViolationData(state, tag);
-    const violations = generateViolationSummaries(violationData);
-    const violationTweets = generateViolationTweets(state, tag, violations);
 
-    // annual summary data
-    const annualSummaryData = await getDataByYear(state, tag);
-    const annualSummaryTweets = generateAnnualSummaryTweets(state, tag, annualSummaryData);
+    if (violationData.length > 0) {    
+      const violations = generateViolationSummaries(violationData);
+      const violationTweets = generateViolationTweets(state, tag, violations);
 
-    // put all the tweets together
-    const tweets = [ ...violationTweets, ...annualSummaryTweets ];
+      // annual summary data
+      const annualSummaryData = await getDataByYear(state, tag);
+      const annualSummaryTweets = generateAnnualSummaryTweets(state, tag, annualSummaryData);
+
+      // put all the tweets together
+      tweets = [ ...violationTweets, ...annualSummaryTweets ];
+    } else {
+      tweets = generateNoViolationsTweet(state, tag);
+    }
 
     // start with replying to original tweet, 
     // and update this value for each subsequent tweet
