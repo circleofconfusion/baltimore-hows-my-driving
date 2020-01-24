@@ -1,6 +1,11 @@
 const test = require('ava');
 const { VIOLATION } = require('./constants');
-const { generateViolationSummaries, generateViolationTweets, matchLicensePlates } = require('./text-parsing');
+const { 
+    generateViolationSummaries,
+    generateViolationTweets,
+    matchLicensePlates,
+    generateAnnualSummaryTweets
+ } = require('./text-parsing');
 
 test('matchLicensePlates will match one license plate', t => {
     const data = matchLicensePlates('@BadDrivingBmore MD:ATRAIN');
@@ -75,4 +80,105 @@ test('generateViolationTweets should properly generate multiple tweets when ther
             `#MD_ATRAIN Violations Cont'd:\n\n2 No stopping/parking stadium event on 33rd St.`
         ]
     )
+});
+
+test('generateAnnualSummaryTweets should properly generate a table in a single tweet', t => {
+    const data =  [
+        { year: '2017', count: '2', annualFines: '80' },
+        { year: '2018', count: '2', annualFines: '115' },
+        { year: '2019', count: '4', annualFines: '195' }
+    ];
+    t.deepEqual(
+        generateAnnualSummaryTweets('MD', 'ATRAIN', data),
+        [
+            '#MD_ATRAIN Fines by Year:\n\nYear #Viol Fines\n2017     2    80\n2018     2   115\n2019     4   195\n     ===========\n         8   390'
+        ]
+    );
+});
+
+test('generateAnnualSummaryTweets should properly break the number of years is more than 280 characters', t=> {
+    const data =  [
+        { year: '2006', count: '2', annualFines: '80' },
+        { year: '2007', count: '2', annualFines: '80' },
+        { year: '2008', count: '1', annualFines: '40' },
+        { year: '2009', count: '1', annualFines: '25' },
+        { year: '2010', count: '3', annualFines: '150' },
+        { year: '2011', count: '1', annualFines: '40' },
+        { year: '2012', count: '1', annualFines: '25' },
+        { year: '2013', count: '3', annualFines: '150' },
+        { year: '2014', count: '1', annualFines: '40' },
+        { year: '2015', count: '1', annualFines: '25' },
+        { year: '2016', count: '3', annualFines: '150' },
+        { year: '2017', count: '2', annualFines: '80' },
+        { year: '2018', count: '2', annualFines: '115' },
+        { year: '2019', count: '4', annualFines: '195' }
+    ];
+    t.deepEqual(
+        generateAnnualSummaryTweets('MD', 'ATRAIN', data),
+        [
+`#MD_ATRAIN Fines by Year:
+
+Year #Viol Fines
+2006     2    80
+2007     2    80
+2008     1    40
+2009     1    25
+2010     3   150
+2011     1    40
+2012     1    25
+2013     3   150
+2014     1    40
+2015     1    25
+2016     3   150
+2017     2    80
+2018     2   115`,
+`#MD_ATRAIN Fines by Year Cont'd:
+
+Year #Viol Fines
+2019     4   195
+     ===========
+        27  1195`
+        ]
+    );
+});
+
+test('generateAnnualSummaryTweets should properly break if the total lines goes over 280 characters', t=> {
+    const data =  [
+        { year: '2008', count: '1', annualFines: '40' },
+        { year: '2009', count: '1', annualFines: '25' },
+        { year: '2010', count: '3', annualFines: '150' },
+        { year: '2011', count: '1', annualFines: '40' },
+        { year: '2012', count: '1', annualFines: '25' },
+        { year: '2013', count: '3', annualFines: '150' },
+        { year: '2014', count: '1', annualFines: '40' },
+        { year: '2015', count: '1', annualFines: '25' },
+        { year: '2016', count: '3', annualFines: '150' },
+        { year: '2017', count: '2', annualFines: '80' },
+        { year: '2018', count: '2', annualFines: '115' },
+        { year: '2019', count: '4', annualFines: '195' }
+    ];
+    t.deepEqual(
+        generateAnnualSummaryTweets('MD', 'ATRAIN', data),
+        [
+`#MD_ATRAIN Fines by Year:
+
+Year #Viol Fines
+2008     1    40
+2009     1    25
+2010     3   150
+2011     1    40
+2012     1    25
+2013     3   150
+2014     1    40
+2015     1    25
+2016     3   150
+2017     2    80
+2018     2   115
+2019     4   195`,
+`#MD_ATRAIN Fines by Year Cont'd:
+
+     ===========
+        23  1035`
+        ]
+    );
 });

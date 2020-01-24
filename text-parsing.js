@@ -1,9 +1,11 @@
 const { VIOLATION } = require('./constants');
+const sprintf = require('sprintf-js').sprintf;
 
 module.exports = {
     matchLicensePlates,
     generateViolationSummaries,
-    generateViolationTweets
+    generateViolationTweets,
+    generateAnnualSummaryTweets
 }
 
 function matchLicensePlates(text) {
@@ -28,5 +30,37 @@ function generateViolationTweets(state, tag, violations) {
             tweets[tweetIndex] = `${heading} Cont'd:\n\n${v}`;
         }
     });
+    return tweets;
+}
+
+function generateAnnualSummaryTweets(state, tag, data) {
+    const heading = `#${state}_${tag} Fines by Year`
+    const tableHeading = 'Year #Viol Fines';
+    let tweets = [
+        `${heading}:\n\n${tableHeading}`
+    ];
+    let tweetIndex = 0;
+    let violationsTotal = 0;
+    let finesTotal = 0;
+    // individual lines of summary table
+    data.forEach(d => {
+        const line = sprintf('\n%4s %5s %5s', d.year, d.count, d.annualFines);
+        if ((tweets[tweetIndex] + line).length <= 280) {
+            tweets[tweetIndex] += line;
+        } else {
+            tweetIndex++;
+            tweets[tweetIndex] = `${heading} Cont'd:\n\n${tableHeading}${line}`;
+        }
+        violationsTotal += +d.count;
+        finesTotal += + d.annualFines;
+    });
+    // total lines
+    const totalLines = sprintf('\n     ===========\n     %5d %5d', violationsTotal, finesTotal);
+    if ((tweets[tweetIndex] + totalLines).length < 280) {
+        tweets[tweetIndex] += totalLines;
+    } else {
+        tweetIndex++;
+        tweets[tweetIndex] = `${heading} Cont'd:\n${totalLines}`;
+    }
     return tweets;
 }
