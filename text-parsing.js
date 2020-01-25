@@ -36,7 +36,7 @@ function generateViolationTweets(state, tag, violations) {
 
 function generateAnnualSummaryTweets(state, tag, data) {
     const heading = `#${state}_${tag} Fines by Year`
-    const tableHeading = 'Year Viols Fines';
+    const tableHeading = '𝗬𝗲𝗮𝗿 𝗩𝗶𝗼𝗹𝗮𝘁𝗶𝗼𝗻𝘀  𝗙𝗶𝗻𝗲𝘀';
     let tweets = [
         `${heading}:\n\n${tableHeading}`
     ];
@@ -45,7 +45,7 @@ function generateAnnualSummaryTweets(state, tag, data) {
     let finesTotal = 0;
     // individual lines of summary table
     data.forEach(d => {
-        const line = sprintf("\n%' 4s %' 6s %' 5s", d.year, d.count, d.annualFines);
+        const line = sprintf("\n%' 4s %' 10s %' 5s", d.year, d.count, d.annualFines);
         if ((tweets[tweetIndex] + line).length <= 280) {
             tweets[tweetIndex] += line;
         } else {
@@ -56,7 +56,7 @@ function generateAnnualSummaryTweets(state, tag, data) {
         finesTotal += + d.annualFines;
     });
     // total lines
-    const totalLines = sprintf("\n     ===========\n     %' 6d $%' 5d", violationsTotal, finesTotal);
+    const totalLines = sprintf("\n     ═════════════════\n     %' 10d $%' 5d", violationsTotal, finesTotal);
     if ((tweets[tweetIndex] + totalLines).length < 280) {
         tweets[tweetIndex] += totalLines;
     } else {
