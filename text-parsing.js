@@ -6,7 +6,8 @@ module.exports = {
     generateViolationSummaries,
     generateViolationTweets,
     generateAnnualSummaryTweets,
-    generateNoViolationsTweet
+    generateNoViolationsTweet,
+    convertToMonospace
 }
 
 function matchLicensePlates(text) {
@@ -36,7 +37,7 @@ function generateViolationTweets(state, tag, violations) {
 
 function generateAnnualSummaryTweets(state, tag, data) {
     const heading = `#${state}_${tag} Fines by Year`
-    const tableHeading = '𝗬𝗲𝗮𝗿 𝗩𝗶𝗼𝗹𝗮𝘁𝗶𝗼𝗻𝘀  𝗙𝗶𝗻𝗲𝘀';
+    const tableHeading = convertToMonospace('Year Violations Fines');
     let tweets = [
         `${heading}:\n\n${tableHeading}`
     ];
@@ -45,7 +46,7 @@ function generateAnnualSummaryTweets(state, tag, data) {
     let finesTotal = 0;
     // individual lines of summary table
     data.forEach(d => {
-        const line = sprintf("\n%' 4s %' 10s %' 5s", d.year, d.count, d.annualFines);
+        const line = convertToMonospace(sprintf("\n%4s %11s %6s", d.year, d.count, d.annualFines));
         if ((tweets[tweetIndex] + line).length <= 280) {
             tweets[tweetIndex] += line;
         } else {
@@ -56,7 +57,7 @@ function generateAnnualSummaryTweets(state, tag, data) {
         finesTotal += + d.annualFines;
     });
     // total lines
-    const totalLines = sprintf("\n     ═════════════════\n     %' 10d $%' 5d", violationsTotal, finesTotal);
+    const totalLines = convertToMonospace(sprintf("\n     ═══════════════════\n     %11d $%5d", violationsTotal, finesTotal));
     if ((tweets[tweetIndex] + totalLines).length < 280) {
         tweets[tweetIndex] += totalLines;
     } else {
@@ -68,4 +69,38 @@ function generateAnnualSummaryTweets(state, tag, data) {
 
 function generateNoViolationsTweet(state, tag) {
     return [ `#${state}_${tag} has no known violations in Baltimore 👍` ];
+}
+
+function convertToMonospace(str) {
+    let output = '';
+    for (let i = 0; i < str.length; i++) {
+        const charCode = str.charCodeAt(i);
+        if (charCode === 32) {
+            // convert to monospace space char
+            output += String.fromCodePoint(0x2007);
+        } else if (charCode === 24) {
+            // convert dollar sign to fullwidth
+            output += String.fromCodePoint(0xff04);
+        } else if (charCode >= 65 && charCode <= 90) {
+            // convert to monospace capital letter
+            const blockStart = 0x1d670;
+            const offset = charCode - 65; 
+            output += String.fromCodePoint(blockStart + offset);
+        } else if (charCode >= 97 && charCode <= 122) {
+            // convert to monospace lowercase letter
+            const blockStart = 0x1d68a;
+            const offset = charCode - 97;
+            output += String.fromCodePoint(blockStart + offset);
+        } else if (charCode >= 48 && charCode <= 57) {
+            // convert to monospace digit
+            const blockStart = 0x1d7f6;
+            const offset = charCode - 48;
+            output += String.fromCodePoint(blockStart + offset);
+        } else {
+            // dunno what this character is, so just pass it on
+            output += str[i];
+        }
+    }
+
+    return output;
 }
