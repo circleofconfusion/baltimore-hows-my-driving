@@ -21,17 +21,29 @@ async function getPrevMonthStats() {
     const yearToSearch = monthToSearch > month ? --year : year;
     
     const rawData = await getMonthlyRecords(yearToSearch, monthToSearch);
+    const totalFines = rawData.reduce((acc, val) => acc += +val.violFine, 0)
+    const worst = worstTags(objToArray(countByTag(rawData.filter(d => !NO_TAG.includes(d.tag)))));
     return Promise.resolve({
+        month: monthToSearch,
+        year: yearToSearch,
         numViolations: rawData.length,
-        totalFines: rawData.reduce((acc, val) => acc += +val.violFine, 0),
-        worst: worstTags(objToArray(countByTag(rawData.filter(d => !NO_TAG.includes(d.tag)))))
+        totalFines,
+        worst
     });
 }
 
 function countByTag(data) {
     return data.reduce((acc, val) => { 
         const plate = `${val.state} ${val.tag}`.toUpperCase();
-        acc.hasOwnProperty(plate) ? acc[plate] += 1 : acc[plate] = 1
+        if (acc.hasOwnProperty(plate)) {
+            acc[plate].count += 1;
+            acc[plate].totalFines += +val.violFine;
+        } else {
+            acc[plate] = {
+                count: 1,
+                totalFines: +val.violFine
+            }
+        }
         return acc;
     }, {});
 }
@@ -41,7 +53,8 @@ function objToArray(obj) {
     for (let key in obj) {
         arr.push({
             plate: key,
-            count: obj[key]
+            count: obj[key].count,
+            totalFines: obj[key].totalFines
         });
     }
     return arr;
