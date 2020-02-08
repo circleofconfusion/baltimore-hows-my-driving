@@ -4,7 +4,7 @@ const { NO_TAG } = require('./tag-special');
 const Twit = require('twit');
 const {
     getMonthlyRecords
-} = require ('./open-baltimore')
+} = require ('./open-baltimore');
 
 module.exports = {
     getPrevMonthStats
@@ -22,42 +22,56 @@ async function getPrevMonthStats() {
     
     const rawData = await getMonthlyRecords(yearToSearch, monthToSearch);
     const totalFines = rawData.reduce((acc, val) => acc += +val.violFine, 0)
-    const worst = worstTags(objToArray(countByTag(rawData.filter(d => !NO_TAG.includes(d.tag)))));
+    const worst = worstTags(countByTag(rawData.filter(d => !NO_TAG.includes(d.tag))));
     return Promise.resolve({
         month: monthToSearch,
         year: yearToSearch,
         numViolations: rawData.length,
         totalFines,
-        worst
+        worst,
+        violationsTotals: groupByViolation(rawData)
     });
 }
 
+function groupByViolation(data) {
+    const groupObj = data.reduce((acc, val) => {
+        const violCode = val.violCode;
+        if (acc.hasOwnProperty(violCode)) {
+            acc[violCode].count += 1;
+        } else {
+            acc[violCode] = {
+                violCode,
+                count: 1
+            };
+        }
+        return acc;
+    }, {});
+
+    return Object.values(groupObj)
+        .sort((a, b) => {
+            if(a.violCode > b.violCode) return 1;
+            else if (a.violCode === b.violCode) return 0;
+            else return -1;
+        });
+}
+
 function countByTag(data) {
-    return data.reduce((acc, val) => { 
+    const groupObj = data.reduce((acc, val) => { 
         const plate = `${val.state} ${val.tag}`.toUpperCase();
         if (acc.hasOwnProperty(plate)) {
             acc[plate].count += 1;
             acc[plate].totalFines += +val.violFine;
         } else {
             acc[plate] = {
+                plate: plate,
                 count: 1,
                 totalFines: +val.violFine
             }
         }
         return acc;
     }, {});
-}
 
-function objToArray(obj) {
-    const arr = [];
-    for (let key in obj) {
-        arr.push({
-            plate: key,
-            count: obj[key].count,
-            totalFines: obj[key].totalFines
-        });
-    }
-    return arr;
+    return Object.values(groupObj);
 }
 
 function worstTags(data) {
