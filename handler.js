@@ -14,7 +14,7 @@ const {
 module.exports = {
   twitterWebhook,
   crcResponse
-}
+};
 
 const T = new Twit({
   consumer_key: process.env.TWITTER_CONSUMER_KEY,
@@ -84,7 +84,7 @@ async function twitterWebhook(event) {
           }
         };
       }
-    }
+    };
 
     for await (let id_str of tweetsAsyncIterable) {
       replyToId = id_str;
@@ -100,13 +100,13 @@ async function crcResponse(event) {
   return {
     statusCode:200,
     body: JSON.stringify({ response_token })
-  }
+  };
 }
 
 function respondToTweet(tweet) {
   if (
-    tweet.hasOwnProperty('user_has_blocked') &&
-    tweet.hasOwnProperty('tweet_create_events') && 
+    Object.prototype.hasOwnProperty.call(tweet, 'user_has_blocked') &&
+    Object.prototype.hasOwnProperty.call(tweet, 'tweet_create_events') && 
     tweet.tweet_create_events.length >= 1
   ) {
     return true;
