@@ -15,6 +15,11 @@ test('matchLicensePlates will match one license plate', t => {
   t.deepEqual(['MD', 'ATRAIN'], data);
 });
 
+test('matchLicensePlates will match license plate even with commas', t => {
+  const data = matchLicensePlates('@BadDrivingBmore MD:ATRAIN,MD:12345');
+  t.deepEqual(['MD', 'ATRAIN'], data);
+});
+
 test('generateViolationSummaries should handle no violations', t => {
   t.deepEqual(generateViolationSummaries([]), []);
 });
