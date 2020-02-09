@@ -1,3 +1,4 @@
+/* eslint-disable no-irregular-whitespace */
 const test = require('ava');
 const { VIOLATION } = require('./constants');
 const { 
