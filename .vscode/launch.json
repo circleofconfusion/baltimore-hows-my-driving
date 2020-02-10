@@ -17,6 +17,16 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "Publish Monthly Summary",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "runtimeExecutable": "node",
+            "runtimeArgs": ["-e", "require('./monthly').publishStats()"]
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Open Baltimore Monthly",
             "skipFiles": [
                 "<node_internals>/**"
