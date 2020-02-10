@@ -78,7 +78,7 @@ function convertToMonospace(str) {
     if (charCode === 32) {
       // convert to monospace space char
       output += String.fromCodePoint(0x2007);
-    } else if (charCode === 24) {
+    } else if (charCode === 0x0024) {
       // convert dollar sign to fullwidth
       output += String.fromCodePoint(0xff04);
     } else if (charCode >= 65 && charCode <= 90) {
