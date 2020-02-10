@@ -4,7 +4,8 @@
   "description": "Responds to Twitter mentions with traffic violation info based on license plate info.",
   "main": "constants.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npx nyc --reporter=lcov --reporter=text ava",
+    "test-watch": "npx ava --watch"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "ava": "^2.4.0",
     "eslint": "^6.8.0",
+    "nyc": "^15.0.0",
     "serverless-dotenv-plugin": "^2.1.1"
   }
 }

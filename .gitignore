@@ -5,6 +5,11 @@ jspm_packages
 # Serverless directories
 .serverless
 
+# test coverage
+.nyc_output
+coverage
+
 # Secret stuff
 .env
 secrets.txt
+
