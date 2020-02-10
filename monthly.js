@@ -1,13 +1,24 @@
 'use strict';
-require('dotenv').config();
 const { NO_TAG } = require('./tag-special');
 const {
   getMonthlyRecords
 } = require ('./open-baltimore');
+const { monthlySummaryTweet, monthlyByViolationsTweets, worstDriverTweets } = require('./text-parsing');
 
 module.exports = {
-  getPrevMonthStats
+  getPrevMonthStats,
+  publishStats
 };
+
+async function publishStats() {
+  const summaryData = await getPrevMonthStats();
+  const tweets = [
+    monthlySummaryTweet(summaryData),
+    ...monthlyByViolationsTweets(summaryData),
+    ...worstDriverTweets(summaryData)
+  ];
+  return tweets;
+}
 
 async function getPrevMonthStats() {
   const now = new Date();
@@ -28,11 +39,11 @@ async function getPrevMonthStats() {
     numViolations: rawData.length,
     totalFines,
     worst,
-    violationsTotals: groupByViolation(rawData)
+    violationTotals: totalsByViolation(rawData)
   });
 }
 
-function groupByViolation(data) {
+function totalsByViolation(data) {
   const groupObj = data.reduce((acc, val) => {
     const violCode = val.violCode;
     if (Object.prototype.hasOwnProperty.call(acc, violCode)) {
@@ -64,13 +75,25 @@ function countByTag(data) {
       acc[plate] = {
         plate: plate,
         count: 1,
-        totalFines: +val.violFine
+        totalFines: +val.violFine,
+        violationTotals: {}
+      };
+    }
+    if (Object.prototype.hasOwnProperty.call(acc[plate].violationTotals, val.violCode)) {
+      acc[plate].violationTotals[val.violCode].count += 1;
+    } else {
+      acc[plate].violationTotals[val.violCode] = {
+        violCode: val.violCode,
+        count: 1
       };
     }
     return acc;
   }, {});
 
-  return Object.values(groupObj);
+  return Object.values(groupObj).map(go => {
+    go.violationTotals = Object.values(go.violationTotals);
+    return go;
+  });
 }
 
 function worstTags(data) {

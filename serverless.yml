@@ -80,6 +80,11 @@ functions:
           path: twitterWebhook
           method: get
 
+  monthlyStats:
+    handler: monthly.publishStats
+    events:
+      - schedule: cron(0 12 15 * * *)
+
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

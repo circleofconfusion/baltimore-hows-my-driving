@@ -7,6 +7,9 @@ module.exports = {
   generateViolationTweets,
   generateAnnualSummaryTweets,
   generateNoViolationsTweet,
+  monthlySummaryTweet,
+  monthlyByViolationsTweets,
+  worstDriverTweets,
   convertToMonospace
 };
 
@@ -103,4 +106,45 @@ function convertToMonospace(str) {
   }
 
   return output;
+}
+
+
+function monthlySummaryTweet(data) {
+  return `Monthly statistics for ${data.month}/${data.year}\n\nTotal Violations: ${data.numViolations}\nTotal Fines: ${data.totalFines}`;
+}
+
+function monthlyByViolationsTweets(data) {
+  const tweetHeading = `Monthly statistics for ${data.month}/${data.year} cont'd\n\n`;
+  const tweets = [
+    tweetHeading
+  ];
+  data.violationTotals.forEach(d => {
+    const line = `${d.count} ${VIOLATION[d.violCode]}\n`;
+    if (tweets[tweets.length - 1].length + line.length <= 280) {
+      tweets[tweets.length - 1] += line;
+    } else {
+      tweets.push(tweetHeading + line);
+    }
+  });
+  return tweets;
+}
+
+function worstDriverTweets(data) {
+  const tweetHeading = `Monthly statistics for ${data.month}/${data.year} cont'd\n\n`;
+  const tweets = [
+    tweetHeading
+  ];
+  data.worst.forEach(w => {
+    const worstPlate = `Worst driver ${w.plate}`;
+    tweets[tweets.length - 1] += `${worstPlate}\n${w.count} violations\nTotal fines: $${w.totalFines}\n`;
+    w.violationTotals.forEach(d => {
+      const line = `${d.count} ${VIOLATION[d.violCode]}\n`;
+      if (tweets[tweets.length - 1].length + line.length <= 280) {
+        tweets[tweets.length - 1] += line;
+      } else {
+        tweets.push(tweetHeading + worstPlate + line);
+      }
+    });
+  });
+  return tweets;
 }

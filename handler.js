@@ -25,6 +25,7 @@ const T = new Twit({
 
 async function twitterWebhook(event) {
   const body = JSON.parse(event.body);
+  console.log('body', body);
   if (respondToTweet(body)) {
     const mention = body.tweet_create_events[0];
     
