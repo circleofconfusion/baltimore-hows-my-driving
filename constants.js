@@ -30,6 +30,17 @@ module.exports = {
     '031': 'Right on red',
     '032': 'Fixed speed camera',
     '033': 'Mobile speed camera',
+    '034': 'Old speed camera',
+    '041': 'No parking/standing in bike lanes',
+    '042': 'Commercial vehicle impeding traffic flow',
+    '043': 'Obstructing/impeding traffic crosswalk/intersection/school',
+    '044': 'No parking/standing vendor truck',
+    '045': 'No parking/standing motor home/camper/travel trailer',
+    '046': 'No parking/standing In bus stop/bus Lane',
+    '047': 'Obstructing/impeding traffic in an intersection or crosswalk',
+    '050': 'Residential parking permit 2nd offense',
+    '051': 'Residential parking permit 3rd offense',
+    '052': 'Residential parking permit 4th offense',
     '099': 'Other/unknown violation'
   }
 };
