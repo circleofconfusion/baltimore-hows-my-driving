@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/circleofconfusion/baltimore-hows-my-driving#readme",
   "dependencies": {
+    "comma-number": "^2.0.1",
     "dotenv": "^8.2.0",
     "sprintf-js": "^1.1.2",
     "twit": "^2.2.11"
