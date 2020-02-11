@@ -1,5 +1,6 @@
 const { VIOLATION } = require('./constants');
 const sprintf = require('sprintf-js').sprintf;
+const commaNumber = require('comma-number');
 
 module.exports = {
   matchLicensePlates,
@@ -110,7 +111,7 @@ function convertToMonospace(str) {
 
 
 function monthlySummaryTweet(data) {
-  return `Monthly statistics for ${data.month}/${data.year}\n\nTotal Violations: ${data.numViolations}\nTotal Fines: ${data.totalFines}`;
+  return `Monthly statistics for ${data.month}/${data.year}\n\nTotal Violations: ${commaNumber(data.numViolations)}\nTotal Fines: $${commaNumber(data.totalFines)}`;
 }
 
 function monthlyByViolationsTweets(data) {
@@ -119,7 +120,7 @@ function monthlyByViolationsTweets(data) {
     tweetHeading
   ];
   data.violationTotals.forEach(d => {
-    const line = `${d.count} ${VIOLATION[d.violCode]}\n`;
+    const line = `${convertToMonospace(sprintf('%-6d', d.count))} ${VIOLATION[d.violCode]}\n`;
     if (tweets[tweets.length - 1].length + line.length <= 280) {
       tweets[tweets.length - 1] += line;
     } else {
@@ -136,9 +137,9 @@ function worstDriverTweets(data) {
   ];
   data.worst.forEach(w => {
     const worstPlate = `Worst driver ${w.plate}`;
-    tweets[tweets.length - 1] += `${worstPlate}\n${w.count} violations\nTotal fines: $${w.totalFines}\n`;
+    tweets[tweets.length - 1] += `${worstPlate}\n${convertToMonospace(sprintf('%-3d', w.count))} violations\nTotal fines: $${w.totalFines}\n`;
     w.violationTotals.forEach(d => {
-      const line = `${d.count} ${VIOLATION[d.violCode]}\n`;
+      const line = `${convertToMonospace(sprintf('%-3s', d.count))} ${VIOLATION[d.violCode]}\n`;
       if (tweets[tweets.length - 1].length + line.length <= 280) {
         tweets[tweets.length - 1] += line;
       } else {

@@ -13,7 +13,7 @@ module.exports = {
   publishTweet
 };
 
-async function publishTweet(text, inReplyToId) {
+function publishTweet(text, inReplyToId) {
   const tweetObj = {
     status: text,
   };

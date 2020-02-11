@@ -4,6 +4,7 @@ const {
   getMonthlyRecords
 } = require ('./open-baltimore');
 const { monthlySummaryTweet, monthlyByViolationsTweets, worstDriverTweets } = require('./text-parsing');
+const { publishTweet } = require('./twitter');
 
 module.exports = {
   getPrevMonthStats,
@@ -17,7 +18,33 @@ async function publishStats() {
     ...monthlyByViolationsTweets(summaryData),
     ...worstDriverTweets(summaryData)
   ];
-  return tweets;
+  
+  let replyToId = undefined;
+
+  const tweetsAsyncIterable = {
+    [Symbol.asyncIterator]() {
+      return  {
+        next() {
+          if (tweets.length) {
+            return publishTweet(tweets.shift(), replyToId)
+              .then(id_str => {
+                return id_str;
+              });
+          } else {
+            return Promise.resolve({
+              done: true
+            });
+          }
+        }
+      };
+    }
+  };
+
+  for await (let id_str of tweetsAsyncIterable) {
+    replyToId = id_str;
+  }
+
+  return { statusCode: 200, body: '' };
 }
 
 async function getPrevMonthStats() {
