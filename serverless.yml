@@ -83,7 +83,7 @@ functions:
   monthlyStats:
     handler: monthly.publishStats
     events:
-      - schedule: cron(0 12 15 * * *)
+      - schedule: cron(0 12 10 * ? *)
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
