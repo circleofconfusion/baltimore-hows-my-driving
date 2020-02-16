@@ -26,10 +26,11 @@ const T = new Twit({
 async function twitterWebhook(event) {
   const body = JSON.parse(event.body);
   console.log('body', body);
+  console.log('extended_tweet', body.tweet_create_events[0].extended_tweet);
   if (respondToTweet(body)) {
     const mention = body.tweet_create_events[0];
     
-    const [ state, tag ] = matchLicensePlates(mention.text);
+    const [ state, tag ] = matchLicensePlates(mention.extended_tweet.full_text);
     const mentionId = mention.id_str;
 
     let tweets = [];
