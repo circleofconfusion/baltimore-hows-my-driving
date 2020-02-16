@@ -13,20 +13,22 @@ module.exports = {
 
 async function publishStats() {
   const summaryData = await getPrevMonthStats();
-  const tweets = [
+  const summaryTweets = [
     monthlySummaryTweet(summaryData),
-    ...monthlyByViolationsTweets(summaryData),
+    ...monthlyByViolationsTweets(summaryData)
+  ];
+  const worstTweets = [
     ...worstDriverTweets(summaryData)
   ];
   
   let replyToId = undefined;
 
-  const tweetsAsyncIterable = {
+  const summaryTweetsAsyncIterable = {
     [Symbol.asyncIterator]() {
       return  {
         next() {
-          if (tweets.length) {
-            return publishTweet(tweets.shift(), replyToId)
+          if (summaryTweets.length) {
+            return publishTweet(summaryTweets.shift(), replyToId)
               .then(id_str => {
                 return id_str;
               });
@@ -40,7 +42,33 @@ async function publishStats() {
     }
   };
 
-  for await (let id_str of tweetsAsyncIterable) {
+  for await (let id_str of summaryTweetsAsyncIterable) {
+    replyToId = id_str;
+  }
+
+  // reset replyToId
+  replyToId = undefined;
+
+  const worstTweetsAsyncIterable = {
+    [Symbol.asyncIterator]() {
+      return  {
+        next() {
+          if (worstTweets.length) {
+            return publishTweet(worstTweets.shift(), replyToId)
+              .then(id_str => {
+                return id_str;
+              });
+          } else {
+            return Promise.resolve({
+              done: true
+            });
+          }
+        }
+      };
+    }
+  };
+
+  for await (let id_str of worstTweetsAsyncIterable) {
     replyToId = id_str;
   }
 

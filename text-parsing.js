@@ -131,9 +131,9 @@ function monthlyByViolationsTweets(data) {
 }
 
 function worstDriverTweets(data) {
-  const tweetHeading = `Monthly statistics for ${data.month}/${data.year} cont'd\n\n`;
+  const tweetHeading = `Monthly statistics for ${data.month}/${data.year}`;
   const tweets = [
-    tweetHeading
+    `${tweetHeading}\n\n`
   ];
   data.worst.forEach(w => {
     const worstPlate = `Worst driver ${w.plate}`;
@@ -143,7 +143,7 @@ function worstDriverTweets(data) {
       if (tweets[tweets.length - 1].length + line.length <= 280) {
         tweets[tweets.length - 1] += line;
       } else {
-        tweets.push(tweetHeading + worstPlate + line);
+        tweets.push(`${tweetHeading} Cont'd\n\n` + worstPlate + line);
       }
     });
   });
