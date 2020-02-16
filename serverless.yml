@@ -15,6 +15,7 @@ service: baltimore-hows-my-driving
 
 plugins:
   - serverless-dotenv-plugin
+  - serverless-prune-plugin
 
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
@@ -63,6 +64,7 @@ package:
     - package-lock.json
     - package.json
     - '*.spec.js'
+    - coverage
 
 functions:
   
@@ -136,3 +138,8 @@ functions:
 #     NewOutput:
 #       Description: "Description for the output"
 #       Value: "Some output value"
+
+custom:
+  prune:
+    automatic: true
+    number: 5
