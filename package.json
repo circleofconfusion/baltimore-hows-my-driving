@@ -29,5 +29,8 @@
     "nyc": "^15.0.0",
     "serverless-dotenv-plugin": "^2.1.1",
     "serverless-prune-plugin": "^1.4.2"
+  },
+  "nyc": {
+    "exclude": "**/*.spec.js"
   }
 }
