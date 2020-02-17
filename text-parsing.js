@@ -15,7 +15,7 @@ module.exports = {
 };
 
 function matchLicensePlates(text) {
-  return text.match(/\b[A-Z]{2}:[A-Z0-9]+\b/i)[0].toUpperCase().split(':');
+  return text.match(/\b[A-Z]{2}:[A-Z0-9]+\b/ig).map(t => t.toUpperCase().split(':'));
 }
 
 function generateViolationSummaries(data) {

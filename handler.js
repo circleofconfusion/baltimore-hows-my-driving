@@ -26,71 +26,88 @@ const T = new Twit({
 async function twitterWebhook(event) {
   const body = JSON.parse(event.body);
   console.log('body', body);
-  console.log('extended_tweet', body.tweet_create_events[0].extended_tweet);
   if (respondToTweet(body)) {
+    console.log('extended_tweet', body.tweet_create_events[0].extended_tweet);
+    console.log('entities', body.tweet_create_events[0].entities);
     const mention = body.tweet_create_events[0];
-    
-    const [ state, tag ] = matchLicensePlates(mention.extended_tweet.full_text);
-    const mentionId = mention.id_str;
 
-    let tweets = [];
-    const violationData = await getViolationData(state, tag);
+    let tweetText;
 
-    if (violationData.length > 0) {    
-      const violations = generateViolationSummaries(violationData);
-      const violationTweets = generateViolationTweets(state, tag, violations);
-
-      // annual summary data
-      const annualSummaryData = await getDataByYear(state, tag);
-      const annualSummaryTweets = generateAnnualSummaryTweets(state, tag, annualSummaryData);
-
-      // put all the tweets together
-      tweets = [ ...violationTweets, ...annualSummaryTweets ];
+    if (mention.extended_tweet && mention.extended_tweet.full_text) {
+      tweetText = mention.extended_tweet.full_text;
     } else {
-      tweets = generateNoViolationsTweet(state, tag);
+      tweetText = mention.text;
     }
 
-    // start with replying to original tweet, 
-    // and update this value for each subsequent tweet
-    let replyToId = mentionId;
+    const plateMatches = matchLicensePlates(tweetText);
 
-    const tweetsAsyncIterable = {
-      [Symbol.asyncIterator]() {
-        return {
-          next() {
-            if (tweets.length) {
-              return new Promise((resolve, reject) => {
-                T.post(
-                  'statuses/update',
-                  {
-                    status: tweets.shift(),
-                    in_reply_to_status_id: replyToId,
-                    auto_populate_reply_metadata: true
-                  },
-                  (err, data) => {
-                    if (err) {
-                      console.error(err);
-                      reject(err);
-                    } else {
-                      resolve({
-                        value: data.id_str,
-                        done: false
-                      });
-                    }
-                  }
-                );
-              });
-            } else {
-              return Promise.resolve({done: true});
-            }
-          }
-        };
+    console.log('plateMatches', plateMatches);
+    
+    await Promise.all(plateMatches.map(async ([state, tag]) => {
+      console.log(state, tag);
+      const mentionId = mention.id_str;
+
+      let tweets = [];
+      const violationData = await getViolationData(state, tag);
+
+      if (violationData.length > 0) {    
+        const violations = generateViolationSummaries(violationData);
+        const violationTweets = generateViolationTweets(state, tag, violations);
+
+        // annual summary data
+        const annualSummaryData = await getDataByYear(state, tag);
+        const annualSummaryTweets = generateAnnualSummaryTweets(state, tag, annualSummaryData);
+
+        // put all the tweets together
+        tweets = [ ...violationTweets, ...annualSummaryTweets ];
+      } else {
+        tweets = generateNoViolationsTweet(state, tag);
       }
-    };
 
-    for await (let id_str of tweetsAsyncIterable) {
-      replyToId = id_str;
-    }
+      // start with replying to original tweet, 
+      // and update this value for each subsequent tweet
+      let replyToId = mentionId;
+
+      const tweetsAsyncIterable = {
+        [Symbol.asyncIterator]() {
+          return {
+            next() {
+              if (tweets.length) {
+                return new Promise((resolve, reject) => {
+                  T.post(
+                    'statuses/update',
+                    {
+                      status: tweets.shift(),
+                      in_reply_to_status_id: replyToId,
+                      auto_populate_reply_metadata: true
+                    },
+                    (err, data) => {
+                      if (err) {
+                        console.error(err);
+                        reject(err);
+                      } else {
+                        resolve({
+                          value: data.id_str,
+                          done: false
+                        });
+                      }
+                    }
+                  );
+                });
+              } else {
+                return Promise.resolve({done: true});
+              }
+            }
+          };
+        }
+      };
+
+      for await (let id_str of tweetsAsyncIterable) {
+        replyToId = id_str;
+      }
+
+      return Promise.resolve();
+    }));
 
     return { statusCode: 200, body: '' };
   }

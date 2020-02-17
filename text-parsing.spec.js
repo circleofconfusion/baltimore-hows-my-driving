@@ -12,12 +12,17 @@ const {
 
 test('matchLicensePlates will match one license plate', t => {
   const data = matchLicensePlates('@BadDrivingBmore MD:ATRAIN');
-  t.deepEqual(['MD', 'ATRAIN'], data);
+  t.deepEqual([['MD', 'ATRAIN']], data);
 });
 
-test('matchLicensePlates will match license plate even with commas', t => {
+test('matchLicensePlates will match two license plates', t => {
+  const data = matchLicensePlates('@BadDrivingBmore MD:ATRAIN MD:12345');
+  t.deepEqual([['MD', 'ATRAIN'], ['MD','12345']], data);
+});
+
+test('matchLicensePlates will match license plates even with no space betweeen plates', t => {
   const data = matchLicensePlates('@BadDrivingBmore MD:ATRAIN,MD:12345');
-  t.deepEqual(['MD', 'ATRAIN'], data);
+  t.deepEqual([['MD', 'ATRAIN'], ['MD','12345']], data);
 });
 
 test('generateViolationSummaries should handle no violations', t => {
