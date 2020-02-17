@@ -64,7 +64,9 @@ package:
     - package-lock.json
     - package.json
     - '*.spec.js'
-    - coverage
+    - coverage/**/*
+    - .vscode/**/*
+    - .nyc_output/**/*
 
 functions:
   
