@@ -1,5 +1,6 @@
 /* eslint-disable no-irregular-whitespace */
 const test = require('ava');
+const commaNumber = require('comma-number');
 const { VIOLATION } = require('./constants');
 const { 
   generateViolationSummaries,
@@ -7,7 +8,10 @@ const {
   matchLicensePlates,
   generateAnnualSummaryTweets,
   generateNoViolationsTweet,
-  convertToMonospace
+  convertToMonospace,
+  monthlySummaryTweet,
+  monthlyByViolationsTweets,
+  worstDriverTweets
 } = require('./text-parsing');
 
 test('matchLicensePlates will match one license plate', t => {
@@ -230,4 +234,227 @@ test('convertToMonospace handles all lowercase letters', t => {
 
 test('convertToMonospace handles all numbers', t => {
   t.is(convertToMonospace('0123456789'), '𝟶𝟷𝟸𝟹𝟺𝟻𝟼𝟽𝟾𝟿');
+});
+
+test('monthlySummaryTweet should retun a summary of the month', t => {
+  const data = {
+    month: 1,
+    year: 2020,
+    numViolations: 75000,
+    totalFines: 3000000
+  };
+  t.is(
+    `Monthly statistics for ${data.month}/${data.year}\n\nTotal Violations: ${commaNumber(data.numViolations)}\nTotal Fines: $${commaNumber(data.totalFines)}`,
+    monthlySummaryTweet(data)
+  );
+});
+
+test('monthlyViolationsByTweets should return an array of one tweet when data is short', t => {
+  const data = {
+    month: 1,
+    year: 2020,
+    violationTotals: [
+      {
+        count: 10,
+        violCode: '030'
+      }
+    ]
+  };
+  t.deepEqual(
+    [
+      `Monthly statistics for 1/2020 cont'd
+
+𝟷𝟶     Red light
+`
+    ],
+    monthlyByViolationsTweets(data)
+  );
+});
+
+test('monthlyViolationsByTweets should return an array of several tweets when data would overflow a tweet', t => {
+  const data = {
+    month: 1,
+    year: 2020,
+    violationTotals: [
+      {
+        count: 10,
+        violCode: '030'
+      },
+      {
+        count: 10,
+        violCode: '031'
+      },
+      {
+        count: 10,
+        violCode: '027'
+      },
+      {
+        count: 10,
+        violCode: '028'
+      },
+      {
+        count: 10,
+        violCode: '026'
+      },
+      {
+        count: 10,
+        violCode: '025'
+      },
+      {
+        count: 10,
+        violCode: '023'
+      },
+      {
+        count: 10,
+        violCode: '022'
+      },
+      {
+        count: 10,
+        violCode: '019'
+      },
+      {
+        count: 10,
+        violCode: '020'
+      }
+    ]
+  };
+  t.deepEqual(
+    [
+      `Monthly statistics for 1/2020 cont'd
+
+𝟷𝟶     Red light
+𝟷𝟶     Right on red
+𝟷𝟶     No stopping/parking street cleaning
+𝟷𝟶     Cruising
+𝟷𝟶     No stopping/parking handicapped zone
+𝟷𝟶     Less than 30 feet from intersection
+𝟷𝟶     Taxi stand
+𝟷𝟶     Expired tags
+`,
+      `Monthly statistics for 1/2020 cont'd
+
+𝟷𝟶     Exceeding 48 hour limit
+𝟷𝟶     Passenger loading zone
+`
+    ],
+    monthlyByViolationsTweets(data)
+  );
+});
+
+test('worstDriverTweets produces 1 tweet if data is short', t => {
+  const data = {
+    month: 1,
+    year: 2020,
+    worst: [
+      {
+        plate: 'MD 12345',
+        count: 20,
+        totalFines: 1000,
+        violationTotals: [
+          {
+            count: 10,
+            violCode: '030'
+          },
+          {
+            count: 10,
+            violCode: '031'
+          }
+        ]
+      }
+    ]
+  };
+  t.deepEqual(
+    [
+      `Monthly statistics for 1/2020
+
+Worst driver MD 12345
+𝟸𝟶  violations
+Total fines: $1000
+𝟷𝟶  Red light
+𝟷𝟶  Right on red
+`
+    ],
+    worstDriverTweets(data)
+  );
+});
+
+
+test('worstDriverTweets produces multiple tweets if data is long', t => {
+  const data = {
+    month: 1,
+    year: 2020,
+    worst: [
+      {
+        plate: 'MD 12345',
+        count: 19,
+        totalFines: 1000,
+        violationTotals: [
+          {
+            count: 10,
+            violCode: '030'
+          },
+          {
+            count: 1,
+            violCode: '031'
+          },
+          {
+            count: 1,
+            violCode: '027'
+          },
+          {
+            count: 1,
+            violCode: '028'
+          },
+          {
+            count: 1,
+            violCode: '026'
+          },
+          {
+            count: 1,
+            violCode: '025'
+          },
+          {
+            count: 1,
+            violCode: '023'
+          },
+          {
+            count: 1,
+            violCode: '022'
+          },
+          {
+            count: 1,
+            violCode: '019'
+          },
+          {
+            count: 1,
+            violCode: '020'
+          }
+        ]
+      }
+    ]
+  };
+  t.deepEqual(
+    [
+      `Monthly statistics for 1/2020
+
+Worst driver MD 12345
+𝟷𝟿  violations
+Total fines: $1000
+𝟷𝟶  Red light
+𝟷   Right on red
+𝟷   No stopping/parking street cleaning
+𝟷   Cruising
+𝟷   No stopping/parking handicapped zone
+𝟷   Less than 30 feet from intersection
+𝟷   Taxi stand
+`,
+      `Monthly statistics for 1/2020 Cont'd
+
+Worst driver MD 12345𝟷   Expired tags
+𝟷   Exceeding 48 hour limit
+𝟷   Passenger loading zone
+`
+    ],
+    worstDriverTweets(data)
+  );
 });
