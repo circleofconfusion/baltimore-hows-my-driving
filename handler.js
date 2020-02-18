@@ -24,6 +24,12 @@ const T = new Twit({
 });
 
 async function twitterWebhook(event) {
+  if (!verifySignature(event)) {
+    return {
+      statusCode: 401
+    };
+  }
+  console.log('event', event);
   const body = JSON.parse(event.body);
   console.log('body', body);
   if (respondToTweet(body)) {
@@ -117,12 +123,13 @@ async function crcResponse(event) {
   const { crc_token } = event.queryStringParameters;
   const response_token = 'sha256=' + crypto.createHmac('sha256', process.env.TWITTER_CONSUMER_SECRET).update(crc_token).digest('base64');
   return {
-    statusCode:200,
+    statusCode: 200,
     body: JSON.stringify({ response_token })
   };
 }
 
 function respondToTweet(tweet) {
+
   if (
     Object.prototype.hasOwnProperty.call(tweet, 'user_has_blocked') &&
     Object.prototype.hasOwnProperty.call(tweet, 'tweet_create_events') && 
@@ -132,4 +139,12 @@ function respondToTweet(tweet) {
   } else {
     return false;
   }
+}
+
+function verifySignature(event) {
+  const signature = event.headers['X-Twitter-Webhooks-Signature'];
+  const body = event.body;
+  const hmac = 'sha256=' + crypto.createHmac('sha256', process.env.TWITTER_CONSUMER_SECRET).update(body).digest('base64');
+
+  return signature === hmac;
 }
