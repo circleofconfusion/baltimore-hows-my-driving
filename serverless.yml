@@ -18,6 +18,7 @@ package:
     - coverage/**/*
     - .vscode/**/*
     - .nyc_output/**/*
+    - twitter_scripts/**/*
 
 functions:
   
