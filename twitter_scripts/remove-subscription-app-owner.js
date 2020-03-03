@@ -10,14 +10,12 @@ const TWITTER_OAUTH = {
   token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 };
 
-// request options
 var request_options = {
   url: `https://api.twitter.com/1.1/account_activity/all/${ENVIRONMENT}/subscriptions.json`,
   oauth: TWITTER_OAUTH,
   resolveWithFullResponse: true
 };
 
-// POST request to create webhook config
 request.delete(request_options).then(function (response) {
   console.log('HTTP response code:', response.statusCode);
 
