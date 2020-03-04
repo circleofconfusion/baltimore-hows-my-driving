@@ -13,6 +13,13 @@ module.exports = {
   publishTweet
 };
 
+/**
+ * Publishes a tweet, and returns an object suitable for use in an async iterator's next() function.
+ * 
+ * @param {string} text The text to publish in a tweet.
+ * @param {string} inReplyToId If replying to another tweet, pass the id_str value of the other tweet.
+ * @returns {Promise} Promise that resolves to an object usable in an async iterator's next() function.
+ */
 function publishTweet(text, inReplyToId) {
   const tweetObj = {
     status: text,

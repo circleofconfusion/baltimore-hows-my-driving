@@ -10,6 +10,7 @@ const {
   generateViolationTweets,
   matchLicensePlates
 } = require('./text-parsing');
+const { publishTweet } = require('./twitter');
 
 module.exports = {
   twitterWebhook,
@@ -79,27 +80,7 @@ async function twitterWebhook(event) {
           return {
             next() {
               if (tweets.length) {
-                return new Promise((resolve, reject) => {
-                  T.post(
-                    'statuses/update',
-                    {
-                      status: tweets.shift(),
-                      in_reply_to_status_id: replyToId,
-                      auto_populate_reply_metadata: true
-                    },
-                    (err, data) => {
-                      if (err) {
-                        console.error(err);
-                        reject(err);
-                      } else {
-                        resolve({
-                          value: data.id_str,
-                          done: false
-                        });
-                      }
-                    }
-                  );
-                });
+                return publishTweet(tweets.shift(), replyToId);
               } else {
                 return Promise.resolve({done: true});
               }
