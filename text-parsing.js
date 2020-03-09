@@ -50,7 +50,7 @@ function generateAnnualSummaryTweets(state, tag, data) {
   let finesTotal = 0;
   // individual lines of summary table
   data.forEach(d => {
-    const line = convertToMonospace(sprintf('\n%4s %11s %6s', d.year, d.count, d.annualFines));
+    const line = convertToMonospace(sprintf('\n%4d %11d %6d', d.year, d.count, d.annualFines));
     if ((tweets[tweetIndex] + line).length <= 280) {
       tweets[tweetIndex] += line;
     } else {
