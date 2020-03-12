@@ -39,7 +39,7 @@ functions:
   monthlyStats:
     handler: monthly.publishStats
     events:
-      - schedule: cron(0 12 10 * ? *)
+      - schedule: cron(0 12 25 * ? *)
 
 custom:
   prune:
