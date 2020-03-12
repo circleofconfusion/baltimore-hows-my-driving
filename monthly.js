@@ -54,7 +54,9 @@ async function publishStats() {
       return  {
         next() {
           if (worstTweets.length) {
-            return publishTweet(worstTweets.shift(), replyToId)
+            const worstTweet = worstTweets.shift();
+            console.log(worstTweet);
+            return publishTweet(worstTweet, replyToId)
               .then(id_str => {
                 return id_str;
               });
