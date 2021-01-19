@@ -1,4 +1,5 @@
 const https = require('https');
+const humps = require('humps');
 
 module.exports = {
   getViolationData,
@@ -7,12 +8,12 @@ module.exports = {
 };
 
 async function getViolationData(state, tag) {
-  const url = `https://data.baltimorecity.gov/resource/2ddy-2uzt.json?$select=violcode,count(violcode) as count&$where=tag='${tag}' AND state='${state}'&$group=violcode`;
+  const url = `https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Parking_Fines/FeatureServer/0/query?where=Tag = '${tag}' AND State = '${state}'&outFields=ViolCode&groupByFieldsForStatistics=ViolCode&outStatistics=[{"statisticType":"count","onStatisticField":"ViolCode","outStatisticFieldName":"Count"}]&f=json`;
   return getOpenBaltimoreData(url);
 }
 
 async function getDataByYear(state, tag) {
-  const url = `https://data.baltimorecity.gov/resource/2ddy-2uzt.json?$select=date_extract_y(violDate) as year,count(*) as count,sum(violFine) as annualFines&$where=tag='${tag}' AND state='${state}'&$group=year&$order=year`;
+  const url = `https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Parking_Fines/FeatureServer/0/query?where=Tag = '${tag}' AND State = '${state}'&groupByFieldsForStatistics=Extract(Year from ViolDate)&outStatistics=[{"statisticType":"count","onStatisticField":"Extract(Year from ViolDate)","outStatisticFieldName":"Count"},{"statisticType":"sum","onStatisticField":"ViolFine","outStatisticFieldName":"AnnualFines"}]&f=json`;
   return getOpenBaltimoreData(url);
 }
 
@@ -30,7 +31,8 @@ async function getOpenBaltimoreData(url) {
         response.on('data', chunk => { data += chunk; });
         response.on('end', () => {
           try {
-            resolve(JSON.parse(data));
+            const parsedData = convertEsriData(JSON.parse(data));
+            resolve(parsedData);
           } catch (err) {
             reject(Error('Failed to retrieve data from Open Baltimore at URL: ' + url + '\nWith Error: ' + err));
           }
@@ -40,4 +42,17 @@ async function getOpenBaltimoreData(url) {
       reject(Error(err));
     });
   });
+}
+
+/**
+ * Parses what's essentially tabular data coming from ESRI's odd geo-oriented format.
+ * @param {Object} data Raw data coming from Open Baltimore/ESRI
+ */
+function convertEsriData(data) {
+  if (data.features) {
+    const simplifiedFeatures = data.features.map(f => f.attributes);
+    return humps.camelizeKeys(simplifiedFeatures);
+  } else {
+    return [];
+  }
 }

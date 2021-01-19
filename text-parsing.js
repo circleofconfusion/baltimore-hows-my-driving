@@ -19,7 +19,7 @@ function matchLicensePlates(text) {
 }
 
 function generateViolationSummaries(data) {
-  return data.map(d => `${d.count} ${VIOLATION[d.violcode]}`);
+  return data.map(d => `${d.count} ${VIOLATION[d.violCode]}`);
 }
 
 function generateViolationTweets(state, tag, violations) {
@@ -50,7 +50,8 @@ function generateAnnualSummaryTweets(state, tag, data) {
   let finesTotal = 0;
   // individual lines of summary table
   data.forEach(d => {
-    const line = convertToMonospace(sprintf('\n%4d %11d %6d', d.year, d.count, d.annualFines));
+    // ESRI ArcGIS REST API doesn't seem to let you alias Extract(Year from ViolDate), so just play along...
+    const line = convertToMonospace(sprintf('\n%4d %11d %6d', d.eXPR1, d.count, d.annualFines));
     if ((tweets[tweetIndex] + line).length <= 280) {
       tweets[tweetIndex] += line;
     } else {

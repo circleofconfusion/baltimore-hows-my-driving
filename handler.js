@@ -1,6 +1,5 @@
 'use strict';
 require('dotenv').config();
-const Twit = require('twit');
 const crypto = require('crypto');
 const { getViolationData, getDataByYear } = require('./open-baltimore');
 const { 
@@ -16,13 +15,6 @@ module.exports = {
   twitterWebhook,
   crcResponse
 };
-
-const T = new Twit({
-  consumer_key: process.env.TWITTER_CONSUMER_KEY,
-  consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
-  access_token: process.env.TWITTER_ACCESS_TOKEN,
-  access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
-});
 
 async function twitterWebhook(event) {
   if (!verifySignature(event)) {

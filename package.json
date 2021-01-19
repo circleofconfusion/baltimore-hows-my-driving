@@ -20,6 +20,7 @@
   "dependencies": {
     "comma-number": "^2.0.1",
     "dotenv": "^8.2.0",
+    "humps": "^2.0.1",
     "sprintf-js": "^1.1.2",
     "twit": "^2.2.11"
   },
