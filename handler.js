@@ -52,48 +52,53 @@ async function twitterWebhook(event) {
     
     await Promise.all(plateMatches.map(async ([state, tag]) => {
       console.log(state, tag);
-      const mentionId = mention.id_str;
+      try {
+        const mentionId = mention.id_str;
 
-      let tweets = [];
-      const violationData = await getViolationData(state, tag);
+        let tweets = [];
+        const violationData = await getViolationData(state, tag);
 
-      if (violationData.length > 0) {    
-        const violations = generateViolationSummaries(violationData);
-        const violationTweets = generateViolationTweets(state, tag, violations);
+        if (violationData.length > 0) {    
+          const violations = generateViolationSummaries(violationData);
+          const violationTweets = generateViolationTweets(state, tag, violations);
 
-        // annual summary data
-        const annualSummaryData = await getDataByYear(state, tag);
-        const annualSummaryTweets = generateAnnualSummaryTweets(state, tag, annualSummaryData);
+          // annual summary data
+          const annualSummaryData = await getDataByYear(state, tag);
+          const annualSummaryTweets = generateAnnualSummaryTweets(state, tag, annualSummaryData);
 
-        // put all the tweets together
-        tweets = [ ...violationTweets, ...annualSummaryTweets ];
-      } else {
-        tweets = generateNoViolationsTweet(state, tag);
-      }
-
-      // start with replying to original tweet, 
-      // and update this value for each subsequent tweet
-      let replyToId = mentionId;
-
-      const tweetsAsyncIterable = {
-        [Symbol.asyncIterator]() {
-          return {
-            next() {
-              if (tweets.length) {
-                return publishTweet(tweets.shift(), replyToId);
-              } else {
-                return Promise.resolve({done: true});
-              }
-            }
-          };
+          // put all the tweets together
+          tweets = [ ...violationTweets, ...annualSummaryTweets ];
+        } else {
+          tweets = generateNoViolationsTweet(state, tag);
         }
-      };
 
-      for await (let id_str of tweetsAsyncIterable) {
-        replyToId = id_str;
+        // start with replying to original tweet, 
+        // and update this value for each subsequent tweet
+        let replyToId = mentionId;
+
+        const tweetsAsyncIterable = {
+          [Symbol.asyncIterator]() {
+            return {
+              next() {
+                if (tweets.length) {
+                  return publishTweet(tweets.shift(), replyToId);
+                } else {
+                  return Promise.resolve({done: true});
+                }
+              }
+            };
+          }
+        };
+
+        for await (let id_str of tweetsAsyncIterable) {
+          replyToId = id_str;
+        }
+
+        return Promise.resolve();
+      } catch (err) {
+        console.error(err);
+        return Promise.reject(err);
       }
-
-      return Promise.resolve();
     }));
 
     return { statusCode: 200, body: '' };

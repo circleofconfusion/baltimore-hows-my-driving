@@ -29,7 +29,11 @@ async function getOpenBaltimoreData(url) {
         let data = '';
         response.on('data', chunk => { data += chunk; });
         response.on('end', () => {
-          resolve(JSON.parse(data));
+          try {
+            resolve(JSON.parse(data));
+          } catch (err) {
+            reject(Error('Failed to retrieve data from Open Baltimore at URL: ' + url + '\nWith Error: ' + err));
+          }
         });
       }
     ).on('error', err => {
