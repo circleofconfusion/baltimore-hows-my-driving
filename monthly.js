@@ -80,7 +80,7 @@ async function publishStats() {
 async function getPrevMonthStats() {
   const now = new Date();
   const month = now.getMonth();
-  // JS months start with 0, and SODA months start with 1.
+  // JS months start with 0, and ESRI API months start with 1.
   // JS month will be equivalent of previous month.
   // If 0, set to the previous December.
   const monthToSearch = month > 0 ? month : 12; 

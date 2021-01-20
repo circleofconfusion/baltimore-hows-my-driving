@@ -18,7 +18,7 @@ async function getDataByYear(state, tag) {
 }
 
 async function getMonthlyRecords(year, month) {
-  const url = `https://data.baltimorecity.gov/resource/2ddy-2uzt.json?$select=state,tag,make,violFine,violCode,violDate,date_extract_y(violDate) as year, date_extract_m(violDate) as month&$where=year='${year}' AND month='${month}'&$order=violDate&$limit=100000`;
+  const url = `https://services1.arcgis.com/UWYHeuuJISiGmgXx/arcgis/rest/services/Parking_Fines/FeatureServer/0/query?outFields=State,Tag,Make,ViolFine,ViolCode,ViolDate,extract(Year from ViolDate) as Year,Extract(Month from ViolDate) as Month&where=Extract(Year from ViolDate) = ${year} AND Extract(Month from ViolDate) = ${month}&orderByFields=ViolDate&f=json`;
   return getOpenBaltimoreData(url);
 }
 
