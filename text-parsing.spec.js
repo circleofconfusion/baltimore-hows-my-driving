@@ -36,14 +36,14 @@ test('generateViolationSummaries should handle no violations', t => {
 test('generateViolationSummaries should correctly parse a single violation record', t => {
   const data = [
     {
-      violcode: '030',
+      violCode: 30,
       count: 2
     }
   ];
   t.deepEqual(
     generateViolationSummaries(data),
     [
-      `${data[0].count} ${VIOLATION[data[0].violcode]}`
+      `${data[0].count} ${VIOLATION[data[0].violCode]}`
     ]
   );
 });
@@ -51,19 +51,19 @@ test('generateViolationSummaries should correctly parse a single violation recor
 test('generateViolationSummaries should correctly parse more than one violation record', t => {
   const data = [
     {
-      violcode: '030',
+      violCode: 30,
       count: 2
     },
     {
-      violcode: '032',
+      violCode: 32,
       count: 3
     }
   ];
   t.deepEqual(
     generateViolationSummaries(data),
     [
-      `${data[0].count} ${VIOLATION[data[0].violcode]}`,
-      `${data[1].count} ${VIOLATION[data[1].violcode]}`
+      `${data[0].count} ${VIOLATION[data[0].violCode]}`,
+      `${data[1].count} ${VIOLATION[data[1].violCode]}`
     ]
   );
 });
@@ -101,9 +101,9 @@ test('generateViolationTweets should properly generate multiple tweets when ther
 
 test('generateAnnualSummaryTweets should properly generate a table in a single tweet', t => {
   const data =  [
-    { year: '2017', count: '2', annualFines: '80' },
-    { year: '2018', count: '2', annualFines: '115' },
-    { year: '2019', count: '4', annualFines: '195' }
+    { eXPR1: 2017, count: 2, annualFines: 80 },
+    { eXPR1: 2018, count: 2, annualFines: 115 },
+    { eXPR1: 2019, count: 4, annualFines: 195 }
   ];
   t.deepEqual(
     generateAnnualSummaryTweets('MD', 'ATRAIN', data),
@@ -122,20 +122,20 @@ test('generateAnnualSummaryTweets should properly generate a table in a single t
 
 test('generateAnnualSummaryTweets should properly break the number of years is more than 280 characters', t=> {
   const data =  [
-    { year: '2006', count: '2', annualFines: '80' },
-    { year: '2007', count: '2', annualFines: '80' },
-    { year: '2008', count: '1', annualFines: '40' },
-    { year: '2009', count: '1', annualFines: '25' },
-    { year: '2010', count: '3', annualFines: '150' },
-    { year: '2011', count: '1', annualFines: '40' },
-    { year: '2012', count: '1', annualFines: '25' },
-    { year: '2013', count: '3', annualFines: '150' },
-    { year: '2014', count: '1', annualFines: '40' },
-    { year: '2015', count: '1', annualFines: '25' },
-    { year: '2016', count: '3', annualFines: '150' },
-    { year: '2017', count: '2', annualFines: '80' },
-    { year: '2018', count: '2', annualFines: '115' },
-    { year: '2019', count: '4', annualFines: '195' }
+    { eXPR1: 2006, count: 2, annualFines: 80 },
+    { eXPR1: 2007, count: 2, annualFines: 80 },
+    { eXPR1: 2008, count: 1, annualFines: 40 },
+    { eXPR1: 2009, count: 1, annualFines: 25 },
+    { eXPR1: 2010, count: 3, annualFines: 150 },
+    { eXPR1: 2011, count: 1, annualFines: 40 },
+    { eXPR1: 2012, count: 1, annualFines: 25 },
+    { eXPR1: 2013, count: 3, annualFines: 150 },
+    { eXPR1: 2014, count: 1, annualFines: 40 },
+    { eXPR1: 2015, count: 1, annualFines: 25 },
+    { eXPR1: 2016, count: 3, annualFines: 150 },
+    { eXPR1: 2017, count: 2, annualFines: 80 },
+    { eXPR1: 2018, count: 2, annualFines: 115 },
+    { eXPR1: 2019, count: 4, annualFines: 195 }
   ];
   t.deepEqual(
     generateAnnualSummaryTweets('MD', 'ATRAIN', data),
@@ -171,18 +171,18 @@ test('generateAnnualSummaryTweets should properly break the number of years is m
 
 test('generateAnnualSummaryTweets should properly break if the total lines goes over 280 characters', t=> {
   const data =  [
-    { year: '2008', count: '1', annualFines: '40' },
-    { year: '2009', count: '1', annualFines: '25' },
-    { year: '2010', count: '3', annualFines: '150' },
-    { year: '2011', count: '1', annualFines: '40' },
-    { year: '2012', count: '1', annualFines: '25' },
-    { year: '2013', count: '3', annualFines: '150' },
-    { year: '2014', count: '1', annualFines: '40' },
-    { year: '2015', count: '1', annualFines: '25' },
-    { year: '2016', count: '3', annualFines: '150' },
-    { year: '2017', count: '2', annualFines: '80' },
-    { year: '2018', count: '2', annualFines: '115' },
-    { year: '2019', count: '4', annualFines: '195' }
+    { eXPR1: 2008, count: 1, annualFines: 40 },
+    { eXPR1: 2009, count: 1, annualFines: 25 },
+    { eXPR1: 2010, count: 3, annualFines: 150 },
+    { eXPR1: 2011, count: 1, annualFines: 40 },
+    { eXPR1: 2012, count: 1, annualFines: 25 },
+    { eXPR1: 2013, count: 3, annualFines: 150 },
+    { eXPR1: 2014, count: 1, annualFines: 40 },
+    { eXPR1: 2015, count: 1, annualFines: 25 },
+    { eXPR1: 2016, count: 3, annualFines: 150 },
+    { eXPR1: 2017, count: 2, annualFines: 80 },
+    { eXPR1: 2018, count: 2, annualFines: 115 },
+    { eXPR1: 2019, count: 4, annualFines: 195 }
   ];
   t.deepEqual(
     generateAnnualSummaryTweets('MD', 'ATRAIN', data),
@@ -256,7 +256,7 @@ test('monthlyViolationsByTweets should return an array of one tweet when data is
     violationTotals: [
       {
         count: 10,
-        violCode: '030'
+        violCode: 30
       }
     ]
   };
@@ -278,43 +278,43 @@ test('monthlyViolationsByTweets should return an array of several tweets when da
     violationTotals: [
       {
         count: 10,
-        violCode: '030'
+        violCode: 30
       },
       {
         count: 10,
-        violCode: '031'
+        violCode: 31
       },
       {
         count: 10,
-        violCode: '027'
+        violCode: 27
       },
       {
         count: 10,
-        violCode: '028'
+        violCode: 28
       },
       {
         count: 10,
-        violCode: '026'
+        violCode: 26
       },
       {
         count: 10,
-        violCode: '025'
+        violCode: 25
       },
       {
         count: 10,
-        violCode: '023'
+        violCode: 23
       },
       {
         count: 10,
-        violCode: '022'
+        violCode: 22
       },
       {
         count: 10,
-        violCode: '019'
+        violCode: 19
       },
       {
         count: 10,
-        violCode: '020'
+        violCode: 20
       }
     ]
   };
@@ -353,11 +353,11 @@ test('worstDriverTweets produces 1 tweet if data is short', t => {
         violationTotals: [
           {
             count: 10,
-            violCode: '030'
+            violCode: 30
           },
           {
             count: 10,
-            violCode: '031'
+            violCode: 31
           }
         ]
       }
@@ -391,43 +391,43 @@ test('worstDriverTweets produces multiple tweets if data is long', t => {
         violationTotals: [
           {
             count: 10,
-            violCode: '030'
+            violCode: 30
           },
           {
             count: 1,
-            violCode: '031'
+            violCode: 31
           },
           {
             count: 1,
-            violCode: '027'
+            violCode: 27
           },
           {
             count: 1,
-            violCode: '028'
+            violCode: 28
           },
           {
             count: 1,
-            violCode: '026'
+            violCode: 26
           },
           {
             count: 1,
-            violCode: '025'
+            violCode: 25
           },
           {
             count: 1,
-            violCode: '023'
+            violCode: 23
           },
           {
             count: 1,
-            violCode: '022'
+            violCode: 22
           },
           {
             count: 1,
-            violCode: '019'
+            violCode: 19
           },
           {
             count: 1,
-            violCode: '020'
+            violCode: 20
           }
         ]
       }
